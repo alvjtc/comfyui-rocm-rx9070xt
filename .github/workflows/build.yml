@@ -1,0 +1,80 @@
+# =================================================================
+# GITHUB ACTIONS: BUILD & PUSH TO GITHUB CONTAINER REGISTRY (GHCR)
+# =================================================================
+name: Build and Push Docker Image
+
+# Trigger the workflow automatically when code is pushed to these branches or tags
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
+  # Allow manual triggering from the GitHub Actions tab
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  # github.repository returns "alvjtc/comfyui-rocm-rx9070xt"
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    # Required permissions to push to GitHub Container Registry
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # CRITICAL STEP: The ROCm base image is ~15GB. Standard GitHub runners have ~14GB free.
+      # This step aggressively removes unused pre-installed software (Android SDKs, .NET, etc.) 
+      # to free up ~30GB of disk space before the Docker build begins.
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Automatically extract and format tags and labels for the image
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=ref,event=pr
+            type=sha,format=short
+
+      # Build the image optimized for RDNA4 and conditionally push it to GHCR
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          # Only push to registry if it's NOT a pull request (security best practice)
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: |
+            ROCM_ARCH=gfx1201
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

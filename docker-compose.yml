@@ -1,0 +1,52 @@
+services:
+  comfyui:
+    # Local build configuration (fallback)
+    build: 
+      context: .
+      args:
+        - ROCM_ARCH=gfx1201
+    
+    # Remote image configuration (GitHub Container Registry)
+    image: ghcr.io/alvjtc/comfyui-rocm-rx9070xt:latest
+    
+    container_name: comfyui-rocm
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+      - render
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    volumes:
+      # System Scripts
+      - ./start.sh:/start.sh:ro
+      # Core ComfyUI Folders
+      - ./models:/workspace/ComfyUI/models
+      - ./output:/workspace/ComfyUI/output
+      - ./input:/workspace/ComfyUI/input
+      - ./custom_nodes:/workspace/ComfyUI/custom_nodes
+      - ./user:/workspace/ComfyUI/user
+      # Persistent Cache for external libraries (HuggingFace, YOLO, etc.)
+      - ./cache:/workspace/cache
+    entrypoint: ["/bin/bash", "/start.sh"]
+    ipc: host
+    network_mode: host
+    environment:
+      # Hardware and Framework Configuration
+      - ROCM_PATH=/opt/rocm
+      - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION:-12.0.0}
+      - PYTORCH_HIP_ALLOC_CONF=${PYTORCH_HIP_ALLOC_CONF:-expandable_segments:True,garbage_collection_threshold:0.8}
+      - FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+      
+      # Application Configuration
+      - CLI_ARGS=${COMFY_ARGS}
+      - COMFY_UPDATE=${COMFY_UPDATE:-false}
+      - TZ=${TZ:-Europe/Madrid}
+      
+      # Force external libraries to use the persistent cache volume
+      - HF_HOME=/workspace/cache/huggingface
+      - TORCH_HOME=/workspace/cache/torch
+    restart: unless-stopped
