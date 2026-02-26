@@ -2,10 +2,6 @@
 Ignore Volume Directories (CRITICAL)
 ==========================================
 
-Prevent tracking gigabytes of models,
-
-personal workflows, and sensitive API keys.
-
 models/
 output/
 input/
