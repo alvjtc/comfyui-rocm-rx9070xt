@@ -1,0 +1,36 @@
+==========================================
+Ignore Volume Directories (CRITICAL)
+==========================================
+
+Prevent tracking gigabytes of models,
+
+personal workflows, and sensitive API keys.
+
+models/
+output/
+input/
+custom_nodes/
+user/
+cache/
+
+==========================================
+System and Python Files
+==========================================
+
+.DS_Store
+Thumbs.db
+pycache/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+==========================================
+IDE Generated Files
+==========================================
+
+.vscode/
+.idea/
