@@ -3,14 +3,14 @@ FROM rocm/pytorch:rocm7.2_ubuntu24.04_py3.12_pytorch_release_2.9.1
 LABEL maintainer="alvjtc" \
     description="Optimized ComfyUI Container for AMD ROCm (RDNA4 / RX 9070 XT)" \
     repository="https://github.com/alvjtc/comfyui-rocm-rx9070xt" \
-    version="0.1.0-alpha"
+    version="0.1.1-alpha"
 
 # System configuration & Environment Variables
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_ROOT_USER_ACTION=ignore \
     ROCM_PATH=/opt/rocm \
     COMFY_ARGS="" \
-    # Enable ultra-fast HuggingFace downloads via Rust toolchain
+    PATH="/opt/venv/bin:$PATH" \
     HF_HUB_ENABLE_HF_TRANSFER=1
 
 # Architecture targeting for AMD RX 9070 XT (RDNA4)
