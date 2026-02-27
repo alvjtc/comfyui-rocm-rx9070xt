@@ -6,7 +6,23 @@ export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 export PIP_CONSTRAINT=/tmp/rocm_constraints.txt
 export DISABLE_CUPY=1
 
+# Force external tools (like uv and Manager) to use the correct Python virtual environment
+export VIRTUAL_ENV="/opt/venv"
+export PATH="/opt/venv/bin:$PATH"
+
 cd /workspace/ComfyUI
+
+# ---------------------------------------------------------
+# Core Extensions Bootstrap
+# Installs essential nodes like ComfyUI-Manager on first run
+# ---------------------------------------------------------
+if [ ! -d "custom_nodes/ComfyUI-Manager" ]; then
+    echo "[INFO] ComfyUI-Manager not found in volume. Bootstrapping installation..."
+    git clone https://github.com/Comfy-Org/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
+    if [ -f "custom_nodes/ComfyUI-Manager/requirements.txt" ]; then
+        pip install --no-cache-dir -c /tmp/rocm_constraints.txt -r custom_nodes/ComfyUI-Manager/requirements.txt || true
+    fi
+fi
 
 # Maintenance mode: Updates ComfyUI and custom nodes dependencies
 if [ "$COMFY_UPDATE" == "true" ]; then

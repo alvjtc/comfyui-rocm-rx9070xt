@@ -8,8 +8,9 @@ A professional-grade, ultra-resilient Docker environment for running **ComfyUI**
 
 ## **✨ Key Features**
 
+* 📦 **Auto-Bootstrap ComfyUI-Manager:** Automatically installs the official ComfyUI-Manager on your first launch. You get an instant, fully functional graphical interface to install models, custom nodes, and updates without touching the terminal.  
 * 🛡️ **Dependency Shield:** A strict constraints system that prevents Custom Nodes from installing NVIDIA or CPU-compatible PyTorch versions, safeguarding your ROCm environment.  
-* ⚡ **Extreme Speed:** Optimized installations and HuggingFace model downloads tailored for maximum bandwidth utilizing hf\_transfer.  
+* ⚡ **Extreme Speed:** Optimized installations and HuggingFace model downloads tailored for maximum bandwidth utilizing hf\_transfer and uv package manager.  
 * 💾 **Total Persistence:** Models, workflows, UI configurations, and even **hidden caches** are safely stored on your local drive. No data is lost if the container is destroyed or rebuilt.  
 * 🧠 **Advanced Memory Management:** Includes jemalloc injection to prevent memory leaks and fragmentation (OOM errors) during extended generation sessions.  
 * 🐳 **GitHub Container Registry (GHCR):** Pre-built images are automatically hosted on GHCR, allowing users to run the environment instantly without building from scratch.
@@ -20,7 +21,7 @@ Upon execution, the following directories will be created on your host system. *
 
 * models/: Checkpoints, LoRAs, ControlNets, VAEs.  
 * output/: Generated images and videos.  
-* custom\_nodes/: ComfyUI extensions and plugins.  
+* custom\_nodes/: ComfyUI extensions and plugins (including the auto-installed ComfyUI-Manager).  
 * user/: Saved UI configurations and workflows.  
 * cache/: (Hidden) Persistent cache for temporary downloads (e.g., HuggingFace hub, YOLO models).
 
