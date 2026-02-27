@@ -41,7 +41,7 @@ RUN pip freeze | grep -E "^(torch|torchvision|torchaudio|triton|pytorch-triton-r
 
 # Group A: Core AI, Math, and HuggingFace ecosystem
 RUN pip install --no-cache-dir -c /tmp/rocm_constraints.txt \
-    packaging ninja toml GitPython dill iopath hf-transfer \
+    packaging ninja toml GitPython dill iopath hf-transfer uv \
     einops safetensors torchsde hydra-core bitsandbytes optimum peft \
     accelerate diffusers transformers gguf rotary-embedding-torch
 
